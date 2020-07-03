@@ -6,7 +6,6 @@ Todo:
 
 Issues:
 - Crimping is a factor. Currently assumes homogeneous unidirectional ply
-- Workaround for odd # of plies is... odd
 
 Future Improvement:
 - Tsai-Hill failure criterion
