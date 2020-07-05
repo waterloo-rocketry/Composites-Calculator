@@ -1,4 +1,4 @@
-#Only works for symmetric laminates for now
+#Only works for symmetric ply thicknesses for now
 #Reference: Example 1 page 17 Chapter 9 Lecture Slides for strain calculation
 #Reference: Example page 19 Chapter 8 Lecture Slides for Primary and Principle stress plots
 import numpy as np
