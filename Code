@@ -1,13 +1,13 @@
-#Symmetric laminates only
+#Only works for symmetric laminates for now
+#Reference: Example 1 page 17 Chapter 9 Lecture Slides for strain calculation
+#Reference: Example page 19 Chapter 8 Lecture Slides for Primary and Principle stress plots
 import numpy as np
 import matplotlib.pyplot as plt
-from math import cos
-from math import sin
-from math import pi
+from math import cos, sin, pi
 
-np.set_printoptions(precision=3)
+np.set_printoptions(precision=4)
 
-#Stiffness matrix Q
+#Stiffness matrix Q e-2
 Q0=[[155.7*1e7,3.02*1e7,0*1e7],[3.02*1e7,12.16*1e7,0*1e7],[0*1e7,0*1e7,4.40*1e7]]
 print (np.array(Q0))
 
@@ -17,14 +17,16 @@ thickness=[0.15*1e-3,0.15*1e-3,0.15*1e-3,0.15*1e-3] #Thickness of each ply from 
 #Unit test len(stack)=len(thickness)?
 
 #Input forces N and moments M per unit length (N/m, N)
-forces=np.array([5000,0,0]) #Nx, Ny, Nxy
+forces=np.array([50400,1809,0]) #Nx, Ny, Nxy
 moments=np.array([0,0,0]) #Mx, My, Mxy
 forces.shape=[3,1]
 moments.shape=[3,1]
 
 #Configure stacking sequence and create array of ply heights about the midplane
 midplane=np.sum(thickness[:])/2 #Geometric midplane
-mid=int(len(thickness)/2) #Array element right before the geometric midplane
+#Array element right before the geometric midplane
+#This is the reason unsymmetric laminates will break the calculator
+mid=int(len(thickness)/2)
         
 if (len(thickness)%2==1): #Odd number of plies
     height=np.zeros(len(thickness)+2)
@@ -38,7 +40,7 @@ else: #Even number of plies
 
 for i in range(len(height)):
     height[i]=np.sum(thickness[0:i])-midplane
-    print("(midplane, height array) ",midplane,", ",height,'\n')
+print("(midplane, height array) ",midplane,", ",height,'\n')
 
 #Transformation matrix T1 inverse (primary strain --> principal strain)
 #Transformation T2 (principal stress --> primary stress)
@@ -54,8 +56,8 @@ def transform_Q(Q0,ply_angle):
    
     return Qbar
 
-#Function returns the stress in primary material directions
-def transform_stress(principalStress,ply_angle):
+#Function returns the stress in primary material directions as a column vector
+def transform_T1(principalStress,ply_angle):
     m=cos(ply_angle)
     n=sin(ply_angle)
     T1=[[m**2,n**2,2*m*n],[n**2,m**2,-2*m*n],[-m*n,m*n,m**2-n**2]]
@@ -63,14 +65,14 @@ def transform_stress(principalStress,ply_angle):
     
     return primaryStress
 
-#Function returns the strain in primary material directions
-def transform_strain(principalStrain,ply_angle):
+#Function returns the strain in primary material directions as a column vector
+def transform_T2(principalStrain,ply_angle):
     m=cos(ply_angle)
     n=sin(ply_angle)
     T2=[[m**2,n**2,m*n],[n**2,m**2,-m*n],[-2*m*n,2*m*n,m**2-n**2]]
     primaryStrain=np.dot(T2,principalStrain)
     
-    return principalStrain
+    return primaryStrain
 
 #Calculate A, B, D matrices by integrating transformed stiffness matrix over all plies based on laminate 
 #constitutive equations
@@ -108,46 +110,45 @@ print ("\n Strains (ex, ey, exy) and radii of curvature (kx, ky, kxy): \n",midst
 #Assign variables for principal strains and stresses in each ply k
 #Calculate principal and primary strains and stresses in each ply k
 #Strain varies linearly
-estrain_prin=midstrain[:3]
-kstrain_prin=midstrain[3:6]
-plystrain_prin=np.zeros(shape=(3,2*len(height)-2))
-plystress_prin=np.zeros(shape=(3,2*len(height)-2))
-plystrain_prim=np.zeros(shape=(3,2*len(height)-2))
-plystress_prim=np.zeros(shape=(3,2*len(height)-2))
-#estrain.shape=[3,1]
-#kstrain.shape=[3,1]
+estrain_glob=midstrain[:3]
+kstrain_glob=midstrain[3:6]
+plystrain_glob=np.zeros(shape=(3,2*len(height)-2))
+plystress_glob=np.zeros(shape=(3,2*len(height)-2))
+plystrain_loc=np.zeros(shape=(3,2*len(height)-2))
+plystress_loc=np.zeros(shape=(3,2*len(height)-2))
+#estrain_glob.shape=[3,1]
+#kstrain_glob.shape=[3,1]
 
-#Are these loops really necessary?
-for i in range(3):
-    plystrain_prin[i,0]
-    plystress_prin[i,0]
-    for j in range(len(height)-2):
-        plystrain_prin[i,2*j+1]=estrain_prin[i,0]+height[j]*kstrain_prin[i,0]
-for j in range:
-        plystress_prin[:,j]=np.dot(Qbar,plystrain_prin[:,j])
-print("\n Principal Strain for each ply k: \n",plystrain_prin,"\n")
-print("\n Principal Stress for each ply k: \n",plystress_prin,"\n")
+#Calculate 2 values of strain and stress for every height element, excluding 
+#the first and last heights which only result in 1 value of strain and stress because they're on the surface
+#There's an opportunity to remove the inner loop but when I try to make height a column vector the dimensions are mismatched
+for k in range(len(height)-1):
+    for i in range(3):
+        plystrain_glob[i,2*k]=estrain_glob[i]+height[k]*kstrain_glob[i]
+        plystrain_glob[i,2*k+1]=estrain_glob[i]+height[k+1]*kstrain_glob[i]
+    Qbar=transform_Q(Q0,stack[k])
+    plystress_glob[:,2*k]=np.dot(Qbar,plystrain_glob[:,2*k])
+    Qbar=transform_Q(Q0,stack[k])
+    plystress_glob[:,2*k+1]=np.dot(Qbar,plystrain_glob[:,2*k+1])
+
+print("\n Principal Strain for each ply boundary: \n",plystrain_glob,"\n")
+print("\n Principal Stress for each ply boundary: \n",plystress_glob,"\n")
 
 #Sanity check to ensure array dimensions are correct
-print ("plystrain_prin shape",plystrain_prin.shape)
-print ("height shape",height.shape)
-print("estrain_prin shape",estrain_prin.shape)
-print("kstrain_prin shape",kstrain_prin.shape)
+#print ("plystrain_glob shape",plystrain_glob.shape)
+#print ("height shape",height.shape)
+#print("estrain_glob shape",estrain_glob.shape)
+#print("kstrain_glob shape",kstrain_glob.shape)
 
-#Calculate primary strains and stresses in each ply k
-plystrain_prim=np.zeros(shape=(3,len(height)))
-plystress_prim=np.zeros(shape=(3,len(height)))
-
-#for j in range(len(height)):
-    #plystrain_prim[:,j]=transform_stress(plystrain_prin,)
-
-#plot        
-for i in range(3):
-    plt.plot(plystrain_prin[i,:5],height)
-    plt.gca().invert_yaxis()
-    plt.xlabel("Laminate Global Strains x10^-2")
-    plt.ylabel("Height Above and Below Midplane (mm)")
-    plt.grid(axis="both")
-    plt.title("Strain Through Laminate Thickness ")
+for k in range(len(height)-1):
+    plystrain_loc[:,2*k]=transform_T1(plystrain_glob[:,2*k],stack[k])
+    plystrain_loc[:,2*k+1]=transform_T1(plystrain_glob[:,2*k+1],stack[k])
+    plystress_loc[:,2*k]=transform_T1(plystress_glob[:,2*k],stack[k])
+    plystress_loc[:,2*k+1]=transform_T1(plystress_glob[:,2*k+1],stack[k])
+print("\n Primary Strain for each ply boundary: \n",plystrain_loc,"\n")
+print("\n Primary Stress for each ply boundary: \n",plystress_loc,"\n")
     
-print ("forces \n",forces,"\n moments \n",moments,"\n strain \n",midstrain)
+plot_height=np.zeros(2*len(height)-2) #x values for plotting purposes mwahahahah >:]  
+for k in range(len(height)-1):
+    plot_height[2*k]=height[k]
+    plot_height[2*k+1]=height[k+1]
