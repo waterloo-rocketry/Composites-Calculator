@@ -1,8 +1,9 @@
 Todo:
-- Variable ply properties
+- Unit tests
+- Make code more efficient/readable
+- Documentation (annotated lecture slides, worked examples)
 - Test case with moments, bending-extension, bending-twisting coupling
 - Calculate and graph per-ply stress
-- Calculate radii of curvature
 
 Issues:
 - Crimping is a factor. Currently assumes homogeneous unidirectional ply
@@ -10,5 +11,4 @@ Issues:
 Future Improvement:
 - Tsai-Hill failure criterion
 - Calculate stiffness matrix based on input material properties
-  - Maybe just do the calculations in Excel and import the CSV?
 
