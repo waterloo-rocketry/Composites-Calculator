@@ -161,8 +161,8 @@ for i in range(len(plystresses)):
             maxstresses[i][3],
             maxstresses[i][4],
             plystresses[i][0],
-            plystresses[i][2],
-            plystresses[i][3]
+            plystresses[i][1],
+            plystresses[i][2]
         )
 
     if (tsai_wu_value >= 1):
