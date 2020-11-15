@@ -94,7 +94,7 @@ print("estrain shape",estrain.shape)
 print("kstarin shape",kstrain.shape)
 
 for i in range(3):
-    for j in range(len(height)):
+    for j in range(ply_num):
         plystrain[i,j]=estrain[i,0]+np.dot(height[j],kstrain[i,0])
 print("\n Strain for each ply k: \n",plystrain,"\n")
         
@@ -109,7 +109,7 @@ for i in range(3):
 print ("forces \n",forces,"\n moments \n",moments,"\n strain \n",midstrain)
 
 #temporary values to input into the function to ensure it works
-plystresses = np.ones(shape=(3,len(height)))
-maxstresses = np.array([[0.5 for _ in range(len(height))] for __ in range(5)])
+plystresses = np.ones(shape=(3,ply_num))
+maxstress = np.full(0.5, (5, ply_num))
 
-print(tsai_wu.failure_criterion(plystresses, maxstresses))
+print(tsai_wu.failure_criterion(plystresses, maxstress))
