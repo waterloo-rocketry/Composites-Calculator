@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from math import cos
 from math import sin
 from math import pi
+import tsai_wu
 
 np.set_printoptions(precision=4)
 
@@ -15,9 +16,10 @@ theta=0
 #Laminate stacking sequence and thicknesses from top down
 stack=[0,pi/2,pi/2,0]
 thickness=[-0.15*1e-3,-0.15*1e-3,0,0.15*1e-3,0.15*1e-3]
+ply_num = len(thickness)
 print (thickness)
-height=np.zeros(len(thickness))
-midplane=int(len(thickness)/2)
+height=np.zeros(ply_num)
+midplane=int(ply_num/2)
 
 #Forces N and moments M per unit length (N/m, N)
 forces=np.array([5000,0,0])
@@ -26,7 +28,7 @@ forces.shape=[3,1]
 moments.shape=[3,1]
 
 #Create array storing the heights of k plies about the midplane
-for i in range(len(thickness)):
+for i in range(ply_num):
     if (i<midplane):
         height[i]=np.sum(thickness[i:midplane])
     else:
@@ -82,8 +84,8 @@ kstrain=midstrain[3:6]
 estrain.shape=[3,1]
 kstrain.shape=[3,1]
 
-plystrain=np.zeros(shape=(3,len(height)))
-plystrain1=np.zeros(shape=(3,len(height)))
+plystrain=np.zeros(shape=(3,ply_num))
+plystrain1=np.zeros(shape=(3,ply_num))
 
 #Sanity check to ensure array dimensions are correct
 print ("plystrain shape",plystrain.shape)
@@ -92,7 +94,7 @@ print("estrain shape",estrain.shape)
 print("kstarin shape",kstrain.shape)
 
 for i in range(3):
-    for j in range(len(height)):
+    for j in range(ply_num):
         plystrain[i,j]=estrain[i,0]+np.dot(height[j],kstrain[i,0])
 print("\n Strain for each ply k: \n",plystrain,"\n")
         
@@ -105,3 +107,9 @@ for i in range(3):
     plt.title("Strain Through Laminate Thickness ")
     
 print ("forces \n",forces,"\n moments \n",moments,"\n strain \n",midstrain)
+
+#temporary values to input into the function to ensure it works
+plystresses = np.ones(shape=(3,ply_num))
+maxstress = np.full(0.5, (5, ply_num))
+
+print(tsai_wu.failure_criterion(plystresses, maxstress))
