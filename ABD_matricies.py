@@ -27,9 +27,9 @@ def ABD_tripple(Q0,stack,height):
 #I think I made a mistake here. The extension-twisting coupling matrix should be B transpose
 def ABD_matrix(A,B,D):
 	return np.concatenate(
-							(
-								np.concatenate((A,B),axis=0),
-								np.concatenate((B,D),axis=0)
-							),
-							axis=1
-							)
+			(
+				np.concatenate((A,B),axis=0),
+				np.concatenate((B,D),axis=0)
+				),
+			axis=1
+			)

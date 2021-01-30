@@ -1,8 +1,9 @@
 import numpy as np
-from math import cos, sin, pi
+from math import cos, sin, pi, ceil
 from Q_and_Qbar import transform_Q
 
 #Function returns the stress in primary material directions as a column vector
+#Transformation matrix T1 inverse (primary strain --> principal strain)
 def transform_T1(principalStress,ply_angle):
     m=cos(ply_angle)
     n=sin(ply_angle)
@@ -10,7 +11,6 @@ def transform_T1(principalStress,ply_angle):
     primaryStress=np.dot(T1,principalStress)
     
     return primaryStress
-
 
 #Calculate 2 values of strain and stress for every height element, excluding 
 #the first and last heights which only result in 1 value of strain and stress because they're on the surface
@@ -20,9 +20,9 @@ def global_ply(Q0, stack, estrain_glob, kstrain_glob,height):
 	plystress_glob=np.zeros(shape=(3,2*len(height)-2))
 
 	for k in range(len(height)-1):
-	    for i in range(3):
-	        plystrain_glob[i,2*k]=estrain_glob[i]+height[k]*kstrain_glob[i]
-	        plystrain_glob[i,2*k+1]=estrain_glob[i]+height[k+1]*kstrain_glob[i]
+	    for i in range(5):
+	        plystrain_glob[i,2*k]=estrain_glob[i]+height[ceil(k/2)]*kstrain_glob[i]
+	        ##Shirely pls check this trick here works on some test data kk thx
 	    Qbar=transform_Q(Q0,stack[k])
 	    plystress_glob[:,2*k]=np.dot(Qbar,plystrain_glob[:,2*k])
 	    Qbar=transform_Q(Q0,stack[k])

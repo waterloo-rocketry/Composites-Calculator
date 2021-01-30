@@ -12,8 +12,6 @@ from tsai_wu import failure_criterion
 
 np.set_printoptions(precision=4)
 
-#Transformation matrix T1 inverse (primary strain --> principal strain)
-#Transformation T2 (principal stress --> primary stress)
 A,B,D = ABD_tripple(Q0,stack,height)
 
 print("\n","A \n",A,"\n B \n",B,"\n D \n",D,"\n")            
@@ -38,6 +36,10 @@ print("\n Principal Strain for each ply boundary: \n",plystrain_glob,"\n")
 print("\n Principal Stress for each ply boundary: \n",plystress_glob,"\n")
 print("\n Primary Strain for each ply boundary: \n",plystrain_loc,"\n")
 print("\n Primary Stress for each ply boundary: \n",plystress_loc,"\n")
+
+#temporary values to input into the function to ensure it works
+plystresses = np.ones(shape=(3,ply_num))
+maxstress = np.full((5, ply_num), 0.5)
 
 print(failure_criterion(plystresses, maxstress))
     
