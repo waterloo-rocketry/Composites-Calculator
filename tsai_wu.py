@@ -5,7 +5,10 @@ If the expresion given is greater than or equal to
 The expression takes as input the maximum stresses
 The laminate can take as well as the stresses it is curretly
 experiencing to determine if the laminate will fail.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2d915d4... Modularize code
 As input, it takes in the maximum tensile (t)
 and compressive (c) stresses the ply can take
 in the 1 and 2 directions and the maximum
@@ -14,6 +17,10 @@ the current stresses (plystress1, 2 and 12) the the
 ply is under.
 """
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2d915d4... Modularize code
 def tsai_wu(F1t, F1c, F2t, F2c, F12, plystress1, plystress2, plystress12):
     f1 = 1/F1t - 1/F1c
     f11 = 1/(F1t * F1c)
@@ -29,6 +36,10 @@ def tsai_wu(F1t, F1c, F2t, F2c, F12, plystress1, plystress2, plystress12):
             f66*plystress12*plystress12 +
             2*f12*plystress1*plystress2)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2d915d4... Modularize code
 """
 The following code assumes that an arrays called
 plystress will be created in the following form
@@ -39,7 +50,10 @@ plystress = [
 ]
 where each element plystress[i] of the array is the sigma 1, 2 and 12 of
 for the ply at stack[i]
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2d915d4... Modularize code
 maxstress = [
          [F1t, F1t, F1t ...],
          [F1c, F1c, F1c ...],
@@ -49,12 +63,18 @@ maxstress = [
 ]
 Where each element of maxstress[i] of the array is the
 maximum stress that the ply at stack[i]
+<<<<<<< HEAD
 
 len(plystress) = len(maxstress)
 
 plystress = np.zeros(shape=(3,len(height)))
 maxstress = np.ones(shape=(5,len(height)))
 
+=======
+len(plystress) = len(maxstress)
+plystress = np.zeros(shape=(3,len(height)))
+maxstress = np.ones(shape=(5,len(height)))
+>>>>>>> 2d915d4... Modularize code
 Failure Criterion. This function
 loops through 2 arrays of the form
 described above and applies the tsai-wu
@@ -67,6 +87,10 @@ all of the incidices and recripricols of
 the tsai-wu values for plys that have failed
 """
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2d915d4... Modularize code
 def failure_criterion(plystress, maxstress):
     has_not_failed = True
     ply_failure_indices = []
@@ -74,6 +98,7 @@ def failure_criterion(plystress, maxstress):
 
     for i in range(len(plystress[0])):
         tsai_wu_value = tsai_wu(
+<<<<<<< HEAD
                 maxstress[0][i],
                 maxstress[1][i],
                 maxstress[2][i],
@@ -83,6 +108,17 @@ def failure_criterion(plystress, maxstress):
                 plystress[1][i],
                 plystress[2][i]
             )
+=======
+            maxstress[0][i],
+            maxstress[1][i],
+            maxstress[2][i],
+            maxstress[3][i],
+            maxstress[4][i],
+            plystress[0][i],
+            plystress[1][i],
+            plystress[2][i]
+        )
+>>>>>>> 2d915d4... Modularize code
 
         if (tsai_wu_value >= 1):
             ply_failure_indices.append(i)
@@ -90,7 +126,14 @@ def failure_criterion(plystress, maxstress):
             ply_failure_reciprocal_tsai_wu_values.append(1/tsai_wu_value)
 
     return (
+<<<<<<< HEAD
             has_not_failed,
             ply_failure_indices,
             ply_failure_reciprocal_tsai_wu_values
         )
+=======
+        has_not_failed,
+        ply_failure_indices,
+        ply_failure_reciprocal_tsai_wu_values
+    )
+>>>>>>> 2d915d4... Modularize code
