@@ -1,6 +1,6 @@
 import numpy as np
 from math import cos, sin, pi
-from Q_Qbar_and_constants import transform_Q
+from Q_and_Qbar import transform_Q
 
 #Calculate A, B, D matrices by integrating transformed stiffness matrix over all plies based on laminate 
 #constitutive equations

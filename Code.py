@@ -4,28 +4,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from math import cos, sin, pi
-from Q_Qbar_and_constants import *
+from constants import *
+from Q_and_Qbar import *
 from ABD_matricies import *
 from stresses_strains import *
+from tsai_wu import failure_criterion
 
 np.set_printoptions(precision=4)
 
 #Transformation matrix T1 inverse (primary strain --> principal strain)
 #Transformation T2 (principal stress --> primary stress)
-
-#Function returns the strain in primary material directions as a column vector
-def transform_T2(principalStrain,ply_angle):
-    m=cos(ply_angle)
-    n=sin(ply_angle)
-    T2=[[m**2,n**2,m*n],[n**2,m**2,-m*n],[-2*m*n,2*m*n,m**2-n**2]]
-    primaryStrain=np.dot(T2,principalStrain)
-    
-    return primaryStrain
-
 A,B,D = ABD_tripple(Q0,stack,height)
 
 print("\n","A \n",A,"\n B \n",B,"\n D \n",D,"\n")            
-A_inv=np.linalg.inv(A)
 
 ABD = ABD_matrix(A,B,D)
 print ("\n ABD stiffness matrix in hectanewton/meter, hectanewton, and hectanewton meter respectively: \n",ABD,"\n")
@@ -47,6 +38,8 @@ print("\n Principal Strain for each ply boundary: \n",plystrain_glob,"\n")
 print("\n Principal Stress for each ply boundary: \n",plystress_glob,"\n")
 print("\n Primary Strain for each ply boundary: \n",plystrain_loc,"\n")
 print("\n Primary Stress for each ply boundary: \n",plystress_loc,"\n")
+
+print(failure_criterion(plystresses, maxstress))
     
 plot_height=np.zeros(2*len(height)-2) #x values for plotting purposes mwahahahah >:]  
 for k in range(len(height)-1):

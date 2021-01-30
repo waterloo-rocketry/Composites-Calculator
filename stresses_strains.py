@@ -1,6 +1,6 @@
 import numpy as np
 from math import cos, sin, pi
-from Q_Qbar_and_constants import transform_Q
+from Q_and_Qbar import transform_Q
 
 #Function returns the stress in primary material directions as a column vector
 def transform_T1(principalStress,ply_angle):
