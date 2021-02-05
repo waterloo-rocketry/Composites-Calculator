@@ -13,6 +13,7 @@ the current stresses (plystress1, 2 and 12) the the
 ply is under.
 """
 
+
 def tsai_wu(F1t, F1c, F2t, F2c, F12, plystress1, plystress2, plystress12):
     f1 = 1/F1t - 1/F1c
     f11 = 1/(F1t * F1c)
@@ -27,6 +28,7 @@ def tsai_wu(F1t, F1c, F2t, F2c, F12, plystress1, plystress2, plystress12):
             f22*plystress2*plystress2 +
             f66*plystress12*plystress12 +
             2*f12*plystress1*plystress2)
+
 
 """
 The following code assumes that an arrays called
@@ -62,6 +64,7 @@ all of the incidices and recripricols of
 the tsai-wu values for plys that have failed
 """
 
+
 def failure_criterion(plystress, maxstress):
     has_not_failed = True
     ply_failure_indices = []
@@ -69,15 +72,15 @@ def failure_criterion(plystress, maxstress):
 
     for i in range(len(plystress[0])):
         tsai_wu_value = tsai_wu(
-                maxstress[0][i],
-                maxstress[1][i],
-                maxstress[2][i],
-                maxstress[3][i],
-                maxstress[4][i],
-                plystress[0][i],
-                plystress[1][i],
-                plystress[2][i]
-            )
+            maxstress[0][i],
+            maxstress[1][i],
+            maxstress[2][i],
+            maxstress[3][i],
+            maxstress[4][i],
+            plystress[0][i],
+            plystress[1][i],
+            plystress[2][i]
+        )
 
         if (tsai_wu_value >= 1):
             ply_failure_indices.append(i)
@@ -85,7 +88,7 @@ def failure_criterion(plystress, maxstress):
             ply_failure_reciprocal_tsai_wu_values.append(1/tsai_wu_value)
 
     return (
-            has_not_failed,
-            ply_failure_indices,
-            ply_failure_reciprocal_tsai_wu_values
-        )
+        has_not_failed,
+        ply_failure_indices,
+        ply_failure_reciprocal_tsai_wu_values
+    )
