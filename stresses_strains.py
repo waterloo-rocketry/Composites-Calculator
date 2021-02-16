@@ -6,11 +6,11 @@ from Q_and_Qbar import transform_Q
 # Transformation matrix T1 inverse (primary strain --> principal strain)
 
 
-def transform_T1(principalStress, ply_angle):
+def transform_T1(principal_stress, ply_angle):
     m = np.cos(ply_angle)
     n = np.sin(ply_angle)
     T1 = [[m**2, n**2, 2*m*n], [n**2, m**2, -2*m*n], [-m*n, m*n, m**2-n**2]]
-    primary_stress = np.dot(T1, principalStress)
+    primary_stress = np.dot(T1, principal_stress)
 
     return primary_stress
 
