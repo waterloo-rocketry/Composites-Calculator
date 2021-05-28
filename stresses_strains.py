@@ -1,5 +1,4 @@
 import numpy as np
-from math import ceil
 from Q_and_Qbar import transform_Q
 
 # Function returns the stress in primary material directions as a column vector
@@ -26,7 +25,7 @@ def global_ply(Q0, stack, estrain_glob, kstrain_glob, height):
     for k in range(len(height)-1):
         for i in range(5):
             plystrain_glob[i, 2*k] = estrain_glob[i] + \
-                height[ceil(k/2)]*kstrain_glob[i]
+                height[np.ceil(k/2)]*kstrain_glob[i]
             # Shirely pls check this trick here works on some test data kk thx
         Qbar = transform_Q(Q0, stack[k])
         plystress_glob[:, 2*k] = np.dot(Qbar, plystrain_glob[:, 2*k])
