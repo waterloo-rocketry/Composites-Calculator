@@ -110,6 +110,6 @@ print ("forces \n",forces,"\n moments \n",moments,"\n strain \n",midstrain)
 
 #temporary values to input into the function to ensure it works
 plystresses = np.ones(shape=(3,ply_num))
-maxstress = np.full(0.5, (5, ply_num))
+maxstress = np.full((5, ply_num),0.5)
 
 print(tsai_wu.failure_criterion(plystresses, maxstress))
