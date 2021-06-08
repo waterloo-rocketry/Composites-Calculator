@@ -22,7 +22,8 @@ if __name__ == "__main__":
     forces, moments = load_forces()
 
     stack = Stack(midplane, layers, forces, moments)
-    ABD = stack.get_ABD()
-    global_ply_stress, global_ply_strain = stack.get_global(ABD)
-    local_ply_stress, local_ply_strain = stack.convert_to_local(global_ply_stress, global_ply_strain)
-    (has_not_failed, ply_failure_indices, ply_failure_reciprocal_tsai_wu_values) = stack.failure_criterion(local_ply_stress)
+    stack.get_ABD()
+    stack.get_global()
+    stack.convert_to_local()
+
+    stack.failure_criterion()

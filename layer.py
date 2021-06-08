@@ -10,6 +10,27 @@ class Layer:
         self.F2t = F2t
         self.F2c = F2c
         self.F12 = F12
+        self.global_ply_strain=[[],[]]
+        self.global_ply_stress=[[],[]]
+
+
+    def get_global_values(self, estrain, kstrain):
+        self.global_ply_strain = np.zeros(shape=(2,3))
+        self.global_ply_stress = np.zeros(shape=(2,3))
+        for i in range(3):
+            self.global_ply_strain[0][i]=estrain[i] + self.height * kstrain[i]
+
+        self.global_ply_stress[0] = np.dot(self.Q_bar, self.global_ply_strain[0, :])
+        self.global_ply_stress[1] = np.dot(self.Q_bar, self.global_ply_strain[1, :])
+
+    def get_local_values(self):
+        self.local_ply_strain = np.zeros(shape=(2, 3))
+        self.local_ply_stress = np.zeros(shape=(2, 3))
+
+        self.local_ply_strain[0] = np.dot(self.global_ply_strain[0], self.T1)
+        self.local_ply_strain[1] = np.dot(self.global_ply_strain[1], self.T1)
+        self.local_ply_stress[0] = np.dot(self.global_ply_stress[0], self.T1)
+        self.local_ply_stress[1] = np.dot(self.global_ply_stress[1], self.T1)
 
     def set_Q_bar(self, Q_0):
         m = np.cos(self.angle)
@@ -25,7 +46,10 @@ class Layer:
         self.h_prev = h_prev
         self.height = h_prev + self.thickness
 
-    def tsai_wu(self, plystress1, plystress2, plystress12):
+    def tsai_wu(self):
+        plystress1 = self.local_ply_stress[0][0]
+        plystress2 = self.local_ply_stress[0][1]
+        plystress12 = self.local_ply_stress[0][2]
         f1 = 1 / self.F1t - 1 / self.F1c
         f11 = 1 / (self.F1t * self.F1c)
         f2 = 1 / self.F2t - 1 / self.F2c
