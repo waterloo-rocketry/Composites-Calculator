@@ -16,7 +16,7 @@ def load_Q_0():
 def calculate_Q_0():
     # format of the material props file is
     # E1,E2,G12,v12
-    with open('./data/material_properties.csv') as csvfile:
+    with open('../data/material_properties.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             [E1, E2, G12, v12] = row
@@ -43,7 +43,7 @@ def get_Q_0():
     else:
         # format of the material props file is
         # E1,E2,G12,v12
-        with open('./data/material_properties.csv') as csvfile:
+        with open('../data/material_properties.csv') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
                 [E1, E2, G12, v12] = row
@@ -68,7 +68,7 @@ def get_layers(Q_0):
     # angleN(pi radians),thicknessN(m), F1tN, F1cN, F2tN, F2cN, F12N
     layers = []
     height = 0
-    with open('./data/layers.csv') as csvfile:
+    with open('../data/layers.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             height = height + float(row[1])
@@ -92,7 +92,7 @@ def load_forces():
     # format of the forces file is:
     # forceX(N),forceY(N),forceZ(N)
     # momentX(N/m),momentY(N/m),momentZ(N/m)
-    with open('./data/forces.csv') as csvfile:
+    with open('../data/forces.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         force = np.array(reader.__next__())
         moment = np.array(reader.__next__())
