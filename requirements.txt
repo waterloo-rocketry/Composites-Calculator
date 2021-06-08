@@ -31,9 +31,11 @@ Mako==1.1.0
 MarkupSafe==1.1.0
 monotonic==1.5
 netifaces==0.10.4
+numpy==1.20.3
 oauthlib==3.1.0
 olefile==0.46
 paramiko==2.6.0
+pbr==5.6.0
 pexpect==4.6.0
 Pillow==7.0.0
 protobuf==3.6.1
@@ -57,6 +59,7 @@ SecretStorage==2.3.1
 simplejson==3.16.0
 six==1.14.0
 systemd-python==234
+testresources==2.0.1
 ubuntu-advantage-tools==20.3
 ubuntu-drivers-common==0.0.0
 ufw==0.36
