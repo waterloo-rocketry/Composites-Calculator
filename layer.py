@@ -57,9 +57,11 @@ class Layer:
         f12 = -1 / 2 * (f11 * f22) ** (0.5)
         f66 = 1 / (self.F12 ** 2)
 
-        return (f1 * plystress1 +
+        tsai_wu_criterion = (f1 * plystress1 +
                 f2 * plystress2 +
                 f11 * plystress1 * plystress1 +
                 f22 * plystress2 * plystress2 +
                 f66 * plystress12 * plystress12 +
                 2 * f12 * plystress1 * plystress2)
+
+        return tsai_wu_criterion
