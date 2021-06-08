@@ -32,35 +32,6 @@ def calculate_Q_0():
     Q = np.array([[Q11, Q12, 0], [Q12, Q22, 0], [0, 0, Q66]])
     return Q
 
-
-def get_Q_0():
-    if (not check_flags()):
-        # format of the q matrix file is:
-        # Q11,Q12,Q13
-        # Q21,Q22,Q23
-        # Q31,Q32,Q33
-        Q = np.genfromtxt('data/q.csv', delimiter=',')
-    else:
-        # format of the material props file is
-        # E1,E2,G12,v12
-        with open('../data/material_properties.csv') as csvfile:
-            reader = csv.reader(csvfile, delimiter=',')
-            for row in reader:
-                [E1, E2, G12, v12] = row
-        E1 = float(E1)
-        E2 = float(E2)
-        G12 = float(G12)
-        v12 = float(v12)
-
-        Q11 = E1 / (1 - v12 ** 2)
-        Q12 = v12 * E1 / (1 - v12 ** 2)
-        Q22 = E2 / (1 - v12 ** 2)
-        Q66 = G12
-        Q = np.array([[Q11, Q12, 0], [Q12, Q22, 0], [0, 0, Q66]])
-    return Q
-
-
-
 def get_layers(Q_0):
     # format of the layers file is:
     # angle1(pi radians),thickness1(m), F1t1, F1c1, F2t1, F2c1, F121
