@@ -10,6 +10,11 @@ class Stack:
         self.force = force
         self.moment = moment
 
+    def set_Q_bars(self):
+        for layer in self.layers:
+            layer.set_Q_bar()
+
+
     def get_ABD(self):
         A = np.zeros([3, 3])
         B = np.zeros([3, 3])
@@ -35,6 +40,7 @@ class Stack:
                 np.concatenate((np.transpose(B), D), axis=0)
             ),
             axis=1)
+        return self.ABD
 
     def get_global(self):
         force_moment = np.append(self.force.astype(float), self.moment.astype(float))

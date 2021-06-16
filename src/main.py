@@ -22,6 +22,7 @@ if __name__ == "__main__":
     forces, moments = load_forces()
 
     stack = Stack(midplane, layers, forces, moments)
+    stack.set_Q_bars()
     stack.get_ABD()
     stack.get_global()
     stack.convert_to_local()

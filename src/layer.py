@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, angle, thickness, F1t, F1c, F2t, F2c, F12):
+    def __init__(self, angle, thickness, F1t, F1c, F2t, F2c, F12, Q_0):
         self.angle = angle
         self.thickness = thickness
         self.F1t = F1t
@@ -12,6 +12,7 @@ class Layer:
         self.F12 = F12
         self.global_ply_strain=[[],[]]
         self.global_ply_stress=[[],[]]
+        self.Q_0=Q_0
 
 
     def get_global_values(self, estrain, kstrain):
@@ -32,14 +33,14 @@ class Layer:
         self.local_ply_stress[0] = np.dot(self.global_ply_stress[0], self.T1)
         self.local_ply_stress[1] = np.dot(self.global_ply_stress[1], self.T1)
 
-    def set_Q_bar(self, Q_0):
+    def set_Q_bar(self):
         m = np.cos(self.angle)
         n = np.sin(self.angle)
         self.T1 = np.array(
             [[m ** 2, n ** 2, 2 * m * n], [n ** 2, m ** 2, -2 * m * n], [-m * n, m * n, m ** 2 - n ** 2]])
         self.T2 = np.array(
             [[m ** 2, n ** 2, m * n], [n ** 2, m ** 2, -m * n], [-2 * m * n, 2 * m * n, m ** 2 - n ** 2]])
-        Q_bar = np.matmul(np.matmul(np.linalg.inv(self.T1), Q_0), self.T2)
+        Q_bar = np.matmul(np.matmul(np.linalg.inv(self.T1), self.Q_0), self.T2)
         self.Q_bar = Q_bar
 
     def set_heights(self, h_prev):

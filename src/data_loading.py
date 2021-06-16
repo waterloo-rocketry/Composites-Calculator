@@ -45,12 +45,11 @@ def get_layers(Q_0):
             height = height + float(row[1])
             layers.append(
                 Layer(float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]),
-                      float(row[6])))
+                  float(row[6]), Q_0))
     midplane = height / 2
 
     h_prev = 0
     for layer in layers:
-        layer.set_Q_bar(Q_0)
         layer.set_heights(h_prev)
         h_prev = layer.height
 
