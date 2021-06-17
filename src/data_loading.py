@@ -38,22 +38,14 @@ def get_layers(Q_0):
     # ...
     # angleN(pi radians),thicknessN(m), F1tN, F1cN, F2tN, F2cN, F12N
     layers = []
-    height = 0
     with open('../data/layers.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
-            height = height + float(row[1])
             layers.append(
                 Layer(float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]),
                   float(row[6]), Q_0))
-    midplane = height / 2
 
-    h_prev = 0
-    for layer in layers:
-        layer.set_heights(h_prev)
-        h_prev = layer.height
-
-    return (midplane, layers)
+    return layers
 
 
 

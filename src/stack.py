@@ -4,15 +4,21 @@ import numpy as np
 
 
 class Stack:
-    def __init__(self, midplane, layers, force, moment):
-        self.midplane = midplane
+    def __init__(self, layers, force, moment):
         self.layers = layers
         self.force = force
         self.moment = moment
 
-    def set_Q_bars(self):
+    def process_layers(self):
+        total_height=0
+        h_prev=0
         for layer in self.layers:
             layer.set_Q_bar()
+            layer.set_heights(h_prev)
+            h_prev = layer.height
+            total_height=total_height+layer.thickness
+
+        self.midplane=total_height/2
 
 
     def get_ABD(self):
@@ -46,6 +52,7 @@ class Stack:
         force_moment = np.append(self.force.astype(float), self.moment.astype(float))
         midstrain = np.dot(np.linalg.inv(self.ABD), force_moment)
         estrain_glob = midstrain[:3]
+        print(print(midstrain))
         kstrain_glob = midstrain[3:6]
 
 
