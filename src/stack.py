@@ -11,57 +11,56 @@ class Stack:
 
     def process_layers(self):
         total_height=0
-        h_prev=0
+        for layer in self.layers:
+            total_height=total_height+layer.thickness
+        self.midplane=total_height/2
+
+
+        h_prev=-self.midplane
         for layer in self.layers:
             layer.set_Q_bar()
             layer.set_heights(h_prev)
             h_prev = layer.height
-            total_height=total_height+layer.thickness
-
-        self.midplane=total_height/2
 
 
     def get_ABD(self):
-        A = np.zeros([3, 3])
-        B = np.zeros([3, 3])
-        D = np.zeros([3, 3])
+        self.A=np.zeros(shape=(3,3))
+        self.B=np.zeros(shape=(3,3))
+        self.D=np.zeros(shape=(3,3))
 
-        for i in range(3):
-            for j in range(3):
-                A_temp = 0
-                B_temp = 0
-                D_temp = 0
-                for k in range(len(self.layers)):
-                    A_temp = A_temp + self.layers[k].Q_bar[i][j] * (self.layers[k].height - self.layers[k].h_prev)
-                    B_temp = B_temp + self.layers[k].Q_bar[i][j] * (
-                            self.layers[k].height ** 2 - self.layers[k].h_prev ** 2)
-                    D_temp = D_temp + self.layers[k].Q_bar[i][j] * (
-                            self.layers[k].height ** 3 - self.layers[k].h_prev ** 3)
-                A[i][j] = A_temp
-                B[i][j] = 1 / 2 * B_temp
-                D[i][j] = 1 / 3 * D_temp
+        for layer in self.layers:
+            self.A = self.A+layer.Q_bar*(layer.height-layer.h_prev)
+            self.B = self.B+layer.Q_bar*(layer.height**2-layer.h_prev**2)/2
+            self.D = self.D+layer.Q_bar*(layer.height**3-layer.h_prev**3)/3
+
         self.ABD = np.concatenate(
             (
-                np.concatenate((A, B), axis=0),
-                np.concatenate((np.transpose(B), D), axis=0)
+                np.concatenate((self.A, self.B), axis=0),
+                np.concatenate((np.transpose(self.B), self.D), axis=0)
             ),
             axis=1)
         return self.ABD
 
-    def get_global(self):
-        force_moment = np.append(self.force.astype(float), self.moment.astype(float))
-        midstrain = np.dot(np.linalg.inv(self.ABD), force_moment)
-        estrain_glob = midstrain[:3]
-        print(print(midstrain))
-        kstrain_glob = midstrain[3:6]
+    def get_strains_and_stresses(self):
+        force_moment = np.append(self.force, self.moment)
+        # the rounding is here because of floating point strangeness 10^-10 precision was chosen with
+        # an arbitrary process:
+        # in testing, it was the value that made all of the values that should have been 0 by rounding
+        # TODO: decide between
+        #  A - continue to round to this amount, to ensure all rounding errors are removed(trig rounding, etc)
+        #  B - decrease rounding, to ensure all floating point errors are handled, but not trig
+        #  C - decrease rounding a lot, decide on another way of handling that sometimes 0*large_number != 0
+        #  D - create special cases for 0s, by handling symmetric laminates, or evaluating trig expressions symbolically
+        midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), force_moment), decimals=6)
+
+        self.estrain_glob = midstrain[:3]
+        self.kstrain_glob = midstrain[3:]
 
 
-        for k in range(len(self.layers)):
-            self.layers[k].get_global_values(estrain_glob, kstrain_glob);
+        for layer in self.layers:
+            layer.get_global_values(self.estrain_glob, self.kstrain_glob)
+            layer.get_local_values()
 
-    def convert_to_local(self):
-        for k in range(len(self.layers)):
-            self.layers[k].get_local_values()
 
     def failure_criterion(self):
         has_not_failed = True

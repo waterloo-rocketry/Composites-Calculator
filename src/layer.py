@@ -16,22 +16,12 @@ class Layer:
 
 
     def get_global_values(self, estrain, kstrain):
-        self.global_ply_strain = np.zeros(shape=(2,3))
-        self.global_ply_stress = np.zeros(shape=(2,3))
-        for i in range(3):
-            self.global_ply_strain[0][i]=estrain[i] + self.height * kstrain[i]
-
-        self.global_ply_stress[0] = np.dot(self.Q_bar, self.global_ply_strain[0, :])
-        self.global_ply_stress[1] = np.dot(self.Q_bar, self.global_ply_strain[1, :])
+        self.global_ply_strain= estrain + self.height*kstrain
+        self.global_ply_stress = np.dot(self.Q_bar, self.global_ply_strain)
 
     def get_local_values(self):
-        self.local_ply_strain = np.zeros(shape=(2, 3))
-        self.local_ply_stress = np.zeros(shape=(2, 3))
-
-        self.local_ply_strain[0] = np.dot(self.global_ply_strain[0], self.T1)
-        self.local_ply_strain[1] = np.dot(self.global_ply_strain[1], self.T1)
-        self.local_ply_stress[0] = np.dot(self.global_ply_stress[0], self.T1)
-        self.local_ply_stress[1] = np.dot(self.global_ply_stress[1], self.T1)
+        self.local_ply_strain = np.dot(self.T1, self.global_ply_strain)
+        self.local_ply_stress = np.dot(self.T2, self.global_ply_stress)
 
     def set_Q_bar(self):
         m = np.cos(self.angle)
