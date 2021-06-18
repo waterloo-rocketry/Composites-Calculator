@@ -2,37 +2,36 @@ import unittest
 
 import numpy as np
 from stack import Stack
-from layer import Layer
+from data_loading import DataHelper
 
 
 class TestCompositesCalculator(unittest.TestCase):
+    stress_tolerance = 10**2
+    Q_tolerance = 10**-1
+    strain_tolerance = 10**-5
 
     def test_example_1(self):
+        layer_data = DataHelper.get_layers("../data/fixtures/example_1_layers.csv")
+        forces_data = DataHelper.load_forces("../data/fixtures/example_1_forces.csv")
+        stack = Stack(layer_data, forces_data)
         Q_0 = np.array([[155.7, 3.02, 0], [3.02, 12.16, 0], [0, 0, 4.40]]) * 10 ** 9
-        layers = [Layer(0, 0.00015, 0, 0, 0, 0, 0, Q_0), Layer(0.5 * np.pi, 0.00015, 0, 0, 0, 0, 0, Q_0),
-                  Layer(0.5 * np.pi, 0.00015, 0, 0, 0, 0, 0, Q_0), Layer(0, 0.00015, 0, 0, 0, 0, 0, Q_0)]
-        stack = Stack(layers, np.array([50400, 1809, 0]), np.array([0, 0, 0]))
-        stack.process_layers()
 
         # assert that the mid-plane is 4 x thickness / 2, or 2 x thickness
         self.assertEqual(stack.midplane, 0.0003)
 
         # Q_bar of the sheet oriented at 0 should be same as Q_0
-        np.testing.assert_allclose(stack.layers[0].Q_bar, Q_0, atol=10 ** -1)
+        np.testing.assert_allclose(stack.layers[0].Q_bar, Q_0, atol=self.Q_tolerance)
         # Q_bar_90 was taken from the Ch.9 solutions on the google drive
         np.testing.assert_allclose(stack.layers[1].Q_bar,
-                                   np.array([[12.16, 3.02, 0], [3.02, 155.7, 0], [0, 0, 4.4]]) * 10 ** 9, atol=10 ** -1)
+                                   np.array([[12.16, 3.02, 0], [3.02, 155.7, 0], [0, 0, 4.4]]) * 10 ** 9, atol=self.Q_tolerance)
 
         ABD = stack.get_ABD()
         A = ABD[0:3, 0:3]
         B = ABD[3:6, 0:3]
         D = ABD[3:6, 3:6]
-        # this is an unsatifying use of absolute tolerance,but the issue is that even though it is ultimately insignficant,
-        # anything is inf bigger than 0
         np.testing.assert_allclose(B, np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]]), atol=10 ** -7)
-        # evaluate that A matrix is calculated correctly
         np.testing.assert_allclose(A, np.array([[50.358, 1.812, 0], [1.812, 50.358, 0], [0, 0, 2.64]]) * 10 ** 6,
-                                   atol=10)
+                                   atol=10**-7)
 
         # evaluate strains in a global reference frame
         stack.get_strains_and_stresses()
@@ -45,22 +44,22 @@ class TestCompositesCalculator(unittest.TestCase):
         global_plystress_0 = np.array([1.558557 * 10 ** 8, 3.023 * 10 ** 6, 0])
         global_plystress_1 = np.array([1.217216 * 10 ** 7, 3.023 * 10 ** 6, 0])
 
-        np.testing.assert_allclose(stack.estrain_glob, global_estrain, atol=10 ** -5)
+        np.testing.assert_allclose(stack.estrain_glob, global_estrain, atol=self.strain_tolerance)
         # moments are zero, and laminate is symmetric, so we expect this to be 0
-        np.testing.assert_allclose(stack.kstrain_glob, np.array([0, 0, 0]), atol=10 ** -15)
+        np.testing.assert_allclose(stack.kstrain_glob, np.array([0, 0, 0]), atol=self.strain_tolerance)
 
         # check its correct for one of the 0 oriented and one of the 90 oriented
-        np.testing.assert_allclose(stack.layers[0].global_ply_strain, global_plystrain, atol=10 ** -5)
-        np.testing.assert_allclose(stack.layers[1].global_ply_strain, global_plystrain, atol=10 ** -5)
+        np.testing.assert_allclose(stack.layers[0].global_ply_strain, global_plystrain, atol=self.strain_tolerance)
+        np.testing.assert_allclose(stack.layers[1].global_ply_strain, global_plystrain, atol=self.strain_tolerance)
 
-        np.testing.assert_allclose(stack.layers[0].global_ply_stress, global_plystress_0, atol=100)
-        np.testing.assert_allclose(stack.layers[1].global_ply_stress, global_plystress_1, atol=100)
+        np.testing.assert_allclose(stack.layers[0].global_ply_stress, global_plystress_0, atol=self.stress_tolerance)
+        np.testing.assert_allclose(stack.layers[1].global_ply_stress, global_plystress_1, atol=self.stress_tolerance)
 
-        np.testing.assert_allclose(stack.layers[0].local_ply_strain, global_plystrain, atol=100)
-        np.testing.assert_allclose(stack.layers[1].local_ply_strain, np.array([0, 10.01 ** -3, 0]), atol=100)
-        np.testing.assert_allclose(stack.layers[0].local_ply_stress, global_plystress_0, atol=100)
+        np.testing.assert_allclose(stack.layers[0].local_ply_strain, global_plystrain, atol=self.strain_tolerance)
+        np.testing.assert_allclose(stack.layers[1].local_ply_strain, np.array([0, 10.01 ** -3, 0]), atol=self.strain_tolerance)
+        np.testing.assert_allclose(stack.layers[0].local_ply_stress, global_plystress_0, atol=self.stress_tolerance)
         np.testing.assert_allclose(stack.layers[1].local_ply_stress, np.array([3.023 * 10 ** 6, 1.217216 * 10 ** 7, 0]),
-                                   atol=100)
+                                   atol=self.stress_tolerance)
 
 
 if __name__ == '__main__':

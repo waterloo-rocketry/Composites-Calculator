@@ -34,10 +34,7 @@ class Layer:
         self.local_ply_stress = np.dot(self.T2, self.global_ply_stress)
 
     def tsai_wu(self):
-        if (self.local_ply_stress == []):
-            print("Ply stress not set, cannot evaluate tsai_wu criterion")
-            return -1
-
+        
         f1 = 1 / self.material.F1t - 1 / self.material.F1c
         f11 = 1 / (self.material.F1t * self.material.F1c)
         f2 = 1 / self.material.F2t - 1 / self.material.F2c

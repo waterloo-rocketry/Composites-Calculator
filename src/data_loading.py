@@ -1,6 +1,7 @@
 import csv
-
 import numpy as np
+
+
 class DataHelper:
 
     @classmethod
@@ -16,7 +17,7 @@ class DataHelper:
         with open(layers_file) as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
-                layers.append((float(row[0]), float(row[1]), row[2]))
+                layers.append((float(row[0])*np.pi, float(row[1]), row[2]))
         return layers
 
     @classmethod
