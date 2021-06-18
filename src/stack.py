@@ -11,7 +11,7 @@ class Stack:
         total_height = 0
         for layer in layers_data:
             self.layers.append(Layer(*layer, total_height))
-            total_height = total_height + layer[1]
+            total_height = total_height + float(layer[1])
         self.midplane = total_height / 2
 
         self.ABD = self.get_ABD()
@@ -56,8 +56,8 @@ class Stack:
         midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), self.force.astype(float)), decimals=6)
 
         for layer in self.layers:
-            layer.get_global_values(midstrain[:3], midstrain[3:], self.midplane)
-            layer.get_local_values()
+            layer.get_ply_stress_strain(midstrain[:3], midstrain[3:], self.midplane)
+
         return midstrain
 
     def failure_criterion(self):
