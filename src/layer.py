@@ -1,6 +1,6 @@
 import numpy as np
 
-from data_loading import get_material
+from data_loading import DataHelper
 from material import Material
 
 
@@ -8,7 +8,7 @@ class Layer:
     def __init__(self, angle, thickness, file, height):
         self.angle = float(angle)
         self.thickness = float(thickness)
-        material_data = get_material(file)
+        material_data = DataHelper.get_material(file)
         self.material = Material(material_data)
 
         m = np.cos(self.angle)
