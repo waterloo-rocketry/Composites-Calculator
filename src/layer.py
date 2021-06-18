@@ -2,14 +2,10 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, angle, thickness, F1t, F1c, F2t, F2c, F12, Q_0):
+    def __init__(self, angle, thickness, max_forces, Q_0):
         self.angle = angle
         self.thickness = thickness
-        self.F1t = F1t
-        self.F1c = F1c
-        self.F2t = F2t
-        self.F2c = F2c
-        self.F12 = F12
+        self.max_forces = max_forces
         self.Q_0 = Q_0
 
         self.global_ply_strain = None
@@ -42,12 +38,12 @@ class Layer:
         plystress1 = self.local_ply_stress[0]
         plystress2 = self.local_ply_stress[1]
         plystress12 = self.local_ply_stress[2]
-        f1 = 1 / self.F1t - 1 / self.F1c
-        f11 = 1 / (self.F1t * self.F1c)
-        f2 = 1 / self.F2t - 1 / self.F2c
-        f22 = 1 / (self.F2t * self.F2c)
+        f1 = 1 / self.max_forces['F1t'] - 1 / self.max_forces['F1c']
+        f11 = 1 / (self.max_forces['F1t']  * self.max_forces['F1c'] )
+        f2 = 1 / self.max_forces['F2t']  - 1 / self.max_forces['F2c']
+        f22 = 1 / (self.max_forces['F2t'] * self.max_forces['F2c'])
         f12 = -1 / 2 * (f11 * f22) ** (0.5)
-        f66 = 1 / (self.F12 ** 2)
+        f66 = 1 / (self.max_forces['F12'] ** 2)
 
         tsai_wu_criterion = (f1 * plystress1 +
                 f2 * plystress2 +

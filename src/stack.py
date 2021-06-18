@@ -1,13 +1,16 @@
-import math
-
 import numpy as np
+from layer import Layer
+from data_loading import load_Q_0, get_layers, load_forces
 
 
 class Stack:
-    def __init__(self, layers, force, moment):
-        self.layers = layers
-        self.force = force
-        self.moment = moment
+    def __init__(self, layers_file, forces_file):
+        Q_0 = load_Q_0()
+        layer_data = get_layers(Q_0, layers_file)
+        self.force, self.moment = load_forces(forces_file)
+        self.layers = []
+        for layer in layer_data:
+            self.layers.append(Layer(*layer))
 
     def process_layers(self):
         total_height=0
