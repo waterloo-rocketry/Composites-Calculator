@@ -51,7 +51,7 @@ class Stack:
         #  B - decrease rounding, to ensure all floating point errors are handled, but not trig
         #  C - decrease rounding a lot, decide on another way of handling that sometimes 0*large_number != 0
         #  D - create special cases for 0s, by handling symmetric laminates, or evaluating trig expressions symbolically
-        midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), force_moment), decimals=6)
+        midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), force_moment.astype(float)), decimals=6)
 
         self.estrain_glob = midstrain[:3]
         self.kstrain_glob = midstrain[3:]

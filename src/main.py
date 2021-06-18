@@ -28,7 +28,6 @@ if __name__ == "__main__":
     stack = Stack(layers, forces, moments)
     stack.process_layers()
     stack.get_ABD()
-    stack.get_global()
-    stack.convert_to_local()
+    stack.get_strains_and_stresses()
 
     stack.failure_criterion()

@@ -10,13 +10,14 @@ class Layer:
         self.F2t = F2t
         self.F2c = F2c
         self.F12 = F12
-        self.global_ply_strain=[[],[]]
-        self.global_ply_stress=[[],[]]
-        self.Q_0=Q_0
+        self.Q_0 = Q_0
+
+        self.global_ply_strain = None
+        self.global_ply_stress = None
 
 
     def get_global_values(self, estrain, kstrain):
-        self.global_ply_strain= estrain + self.height*kstrain
+        self.global_ply_strain = estrain + self.height*kstrain
         self.global_ply_stress = np.dot(self.Q_bar, self.global_ply_strain)
 
     def get_local_values(self):
@@ -38,9 +39,9 @@ class Layer:
         self.height = h_prev + self.thickness
 
     def tsai_wu(self):
-        plystress1 = self.local_ply_stress[0][0]
-        plystress2 = self.local_ply_stress[0][1]
-        plystress12 = self.local_ply_stress[0][2]
+        plystress1 = self.local_ply_stress[0]
+        plystress2 = self.local_ply_stress[1]
+        plystress12 = self.local_ply_stress[2]
         f1 = 1 / self.F1t - 1 / self.F1c
         f11 = 1 / (self.F1t * self.F1c)
         f2 = 1 / self.F2t - 1 / self.F2c
