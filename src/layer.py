@@ -1,26 +1,20 @@
 import numpy as np
 
+from data_loading import load_Q_0, calculate_Q_0
+
 
 class Layer:
-    def __init__(self, angle, thickness, max_forces, Q_0):
+    def __init__(self, angle, thickness, max_forces, mode, file, height):
+
         self.angle = angle
         self.thickness = thickness
         self.max_forces = max_forces
-        self.Q_0 = Q_0
 
-        self.global_ply_strain = None
-        self.global_ply_stress = None
+        if(mode=='load'):
+            self.Q_0 = load_Q_0(file)
+        elif(mode=='calc'):
+            self.Q_0 = calculate_Q_0(file)
 
-
-    def get_global_values(self, estrain, kstrain):
-        self.global_ply_strain = estrain + self.height*kstrain
-        self.global_ply_stress = np.dot(self.Q_bar, self.global_ply_strain)
-
-    def get_local_values(self):
-        self.local_ply_strain = np.dot(self.T1, self.global_ply_strain)
-        self.local_ply_stress = np.dot(self.T2, self.global_ply_stress)
-
-    def set_Q_bar(self):
         m = np.cos(self.angle)
         n = np.sin(self.angle)
         self.T1 = np.array(
@@ -29,6 +23,19 @@ class Layer:
             [[m ** 2, n ** 2, m * n], [n ** 2, m ** 2, -m * n], [-2 * m * n, 2 * m * n, m ** 2 - n ** 2]])
         Q_bar = np.matmul(np.matmul(np.linalg.inv(self.T1), self.Q_0), self.T2)
         self.Q_bar = Q_bar
+
+        self.height = height
+
+        self.global_ply_strain = None
+        self.global_ply_stress = None
+
+    def get_global_values(self, estrain, kstrain, midplane):
+        self.global_ply_strain = estrain + (self.height-midplane)*kstrain
+        self.global_ply_stress = np.dot(self.Q_bar, self.global_ply_strain)
+
+    def get_local_values(self):
+        self.local_ply_strain = np.dot(self.T1, self.global_ply_strain)
+        self.local_ply_stress = np.dot(self.T2, self.global_ply_stress)
 
     def set_heights(self, h_prev):
         self.h_prev = h_prev

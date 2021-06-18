@@ -1,51 +1,50 @@
 import numpy as np
 from layer import Layer
-from data_loading import load_Q_0, get_layers, load_forces
 
 
 class Stack:
-    def __init__(self, layers_file, forces_file):
-        Q_0 = load_Q_0()
-        layer_data = get_layers(Q_0, layers_file)
-        self.force, self.moment = load_forces(forces_file)
+    def __init__(self, layers_data, forces_data):
+
+        self.force = forces_data
         self.layers = []
-        for layer in layer_data:
-            self.layers.append(Layer(*layer))
 
-    def process_layers(self):
-        total_height=0
-        for layer in self.layers:
-            total_height=total_height+layer.thickness
-        self.midplane=total_height/2
+        total_height = 0
+        for layer in layers_data:
+            self.layers.append(Layer(*layer, total_height))
+            total_height = total_height + layer[1]
+        self.midplane = total_height / 2
 
+        self.ABD = self.get_ABD()
 
-        h_prev=-self.midplane
-        for layer in self.layers:
-            layer.set_Q_bar()
-            layer.set_heights(h_prev)
-            h_prev = layer.height
+        midstrain = self.get_strains_and_stresses()
+
+        self.estrain_glob = midstrain[:3]
+        self.kstrain_glob = midstrain[3:]
+        self.failed, self.failed_layers_indices = self.failure_criterion()
 
 
     def get_ABD(self):
-        self.A=np.zeros(shape=(3,3))
-        self.B=np.zeros(shape=(3,3))
-        self.D=np.zeros(shape=(3,3))
+        A = np.zeros(shape=(3, 3))
+        B = np.zeros(shape=(3, 3))
+        D = np.zeros(shape=(3, 3))
 
         for layer in self.layers:
-            self.A = self.A+layer.Q_bar*(layer.height-layer.h_prev)
-            self.B = self.B+layer.Q_bar*(layer.height**2-layer.h_prev**2)/2
-            self.D = self.D+layer.Q_bar*(layer.height**3-layer.h_prev**3)/3
+            h_0 = layer.height - self.midplane
+            h_1 = layer.height + layer.thickness - self.midplane
+            A = A + layer.Q_bar * (h_1 - h_0)
+            B = B + layer.Q_bar * (h_1 ** 2 - h_0 ** 2) / 2
+            D = D + layer.Q_bar * (h_1 ** 3 - h_0 ** 3) / 3
 
-        self.ABD = np.concatenate(
+        ABD = np.concatenate(
             (
-                np.concatenate((self.A, self.B), axis=0),
-                np.concatenate((np.transpose(self.B), self.D), axis=0)
+                np.concatenate((A, B), axis=0),
+                np.concatenate((np.transpose(B), D), axis=0)
             ),
             axis=1)
-        return self.ABD
+        return ABD
 
     def get_strains_and_stresses(self):
-        force_moment = np.append(self.force, self.moment)
+
         # the rounding is here because of floating point strangeness 10^-10 precision was chosen with
         # an arbitrary process:
         # in testing, it was the value that made all of the values that should have been 0 by rounding
@@ -54,32 +53,25 @@ class Stack:
         #  B - decrease rounding, to ensure all floating point errors are handled, but not trig
         #  C - decrease rounding a lot, decide on another way of handling that sometimes 0*large_number != 0
         #  D - create special cases for 0s, by handling symmetric laminates, or evaluating trig expressions symbolically
-        midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), force_moment.astype(float)), decimals=6)
-
-        self.estrain_glob = midstrain[:3]
-        self.kstrain_glob = midstrain[3:]
-
+        midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), self.force.astype(float)), decimals=6)
 
         for layer in self.layers:
-            layer.get_global_values(self.estrain_glob, self.kstrain_glob)
+            layer.get_global_values(midstrain[:3], midstrain[3:], self.midplane)
             layer.get_local_values()
-
+        return midstrain
 
     def failure_criterion(self):
-        has_not_failed = True
+        failed = False
         ply_failure_indices = []
-        ply_failure_reciprocal_tsai_wu_values = []
 
         for i in range(len(self.layers)):
             tsai_wu_value = self.layers[i].tsai_wu()
 
-            if (tsai_wu_value >= 1):
+            if tsai_wu_value >= 1:
                 ply_failure_indices.append(i)
-                has_not_failed = False
-                ply_failure_reciprocal_tsai_wu_values.append(1 / tsai_wu_value)
+                failed = True
 
         return (
-            has_not_failed,
+            failed,
             ply_failure_indices,
-            ply_failure_reciprocal_tsai_wu_values
         )
