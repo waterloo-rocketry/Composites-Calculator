@@ -15,3 +15,4 @@ if __name__ == "__main__":
         stack_data = json.load(f)
 
     stack = Stack(stack_data)
+    stack.produce_text_output()

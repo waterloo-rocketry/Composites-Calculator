@@ -1,32 +1,51 @@
 #Composites Calculator - WRT
-##File format
-###Note: This should probably be JSON instead
-###Forces file
-The file at ./data/forces.csv has one line with the format:
+To run:
+```
+python3 main.py [path_to_stack]
+```
+##Input
+###Stack
+The input is in the form of a json in the data/stacks directory.
 
-Fx(N),Fy(N),Fz(N),Mx(Nm),My(Nm),Mxy(Nm)
+The stack file format can be found in the example1.json file in this directory. Any number of layers can be added to the layers array in this folder.
 
-###Layers file
-The file at ./data/layers.csv has a line for each layer in the stack with the format:
+The material value should be a reference to a file in the data/materials directory.
 
-angle(pi radians),thickness(m),path_to_material
+###Materials
+The materials file is in the form of json in the data/materials directory.
 
-Where path_to_material is the path to the materials file that applies to that layer
-###Materials file
-The file at ./data/material.csv has the format:
+The maximum loads should be provided, and there are two options for evaluating the stiffness.
 
-F1t(N),F1c(N),F2t(N),F2c(N),F12(N),load/calc,path
+EITHER,
 
-ehere load/calc is a choice of whether to load Q or calculate, path is the path to either the Q file or the material props
-###Q File
-The file at ./data/forces.csv has the format:
+a two dimensional array, with key "Q" should be provided with the Q_0 matrix for the material, as in data/materials/carbon_epoxy.json
 
-Fx(N),Fy(N),Fz(N),Mx(Nm),My(Nm),Mxy(Nm)
-###Properties file
-The file at ./data/forces.csv has the format:
+OR
 
-Fx(N),Fy(N),Fz(N),Mx(Nm),My(Nm),Mxy(Nm)
-##Todo:
-- Get the tests finished and working for all three, find one for failure criterion
-- Create a pretty and useful output
-- Convert to use JSON, ask for the single file, add explanation of format
+the material properties from empirical testing can be provided, as in data/materials/example_of_calculated
+
+##Work to Be Done
+###Potential Directions
+A better interface might be a consideration. Creating a UI or better CLI would allow us to use this a bit easier
+
+An editor of some kind so that we do not have to edit JSON directly might also be a benefit
+
+A way of producing comparisons, or a way for it to make recommendations as to the direction that more fibre is needed, etc could reduce even more of the analysis that has to be done manually
+
+###Testing
+More testing needs to be done to verify that the failure criterion are working. There are no examples of the failure criterion on drive, we should find examples with confirmed answers
+
+More testing of strange configurations (those with multiple materials, uneven number of layers, etc)
+
+###Cleanup
+I expect that others looking at the code will have good suggestions for clarity. Fixes should be made to refine logic and improve readability.
+
+
+
+
+
+
+
+
+
+

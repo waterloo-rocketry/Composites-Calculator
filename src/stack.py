@@ -4,11 +4,12 @@ from layer import Layer
 
 class Stack:
     def __init__(self, stack_data):
+        self.name = stack_data['name']
         forces_data = stack_data['forces']
         layers_data = stack_data['layers']
         self.force = np.array([forces_data['Fx'],forces_data['Fy'],forces_data['Fz'],forces_data['Mx'],forces_data['My'], forces_data['Mxy']])
-        self.layers = []
 
+        self.layers = []
         total_height = 0
         for layer in layers_data:
             self.layers.append(Layer(float(layer['angle'])*np.pi, float(layer['thickness']), layer['material'], total_height))
@@ -45,15 +46,6 @@ class Stack:
         return ABD
 
     def get_strains_and_stresses(self):
-
-        # the rounding is here because of floating point strangeness 10^-10 precision was chosen with
-        # an arbitrary process:
-        # in testing, it was the value that made all of the values that should have been 0 by rounding
-        # TODO: decide between
-        #  A - continue to round to this amount, to ensure all rounding errors are removed(trig rounding, etc)
-        #  B - decrease rounding, to ensure all floating point errors are handled, but not trig
-        #  C - decrease rounding a lot, decide on another way of handling that sometimes 0*large_number != 0
-        #  D - create special cases for 0s, by handling symmetric laminates, or evaluating trig expressions symbolically
         midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), self.force.astype(float)), decimals=6)
 
         for layer in self.layers:
@@ -65,14 +57,31 @@ class Stack:
         failed = False
         ply_failure_indices = []
 
-        for i in range(len(self.layers)):
-            tsai_wu_value = self.layers[i].tsai_wu()
+        for index, layer in enumerate(self.layers):
+            tsai_wu_value = layer.tsai_wu()
 
             if tsai_wu_value >= 1:
-                ply_failure_indices.append(i)
+                ply_failure_indices.append(index)
                 failed = True
 
         return (
             failed,
             ply_failure_indices,
         )
+
+    def produce_text_output(self):
+        print(f"Displaying analysis for: {self.name}")
+
+        print('ABD Matrix: ')
+        np.set_printoptions(linewidth=np.inf)
+        print(self.ABD)
+        print('\n')
+
+        if(not self.failed):
+            print('Laminate did not fail!')
+        else:
+            print('Laminate failed\n')
+            print('The failed laminates were: ')
+            for i in range(len(self.failed_layers_indices)):
+                print(f'\t Layer {i} - Thickness: {self.layers[i].thickness} meters, Angle: {self.layers[i].angle} pi radians ')
+
