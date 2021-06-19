@@ -17,14 +17,12 @@ class Material:
             self.Q_0 = self.calculate_Q_0(material_data['properties'])
 
 
-    def calculate_Q_0(self):
-        with open(self.file) as csvfile:
-            reader = csv.reader(csvfile, delimiter=',')
-            [E1, E2, G12, v12] = next(reader)
-        E1 = float(E1)
-        E2 = float(E2)
-        G12 = float(G12)
-        v12 = float(v12)
+    def calculate_Q_0(self, properties):
+
+        E1 = float(properties['E1'])
+        E2 = float(properties['E2'])
+        G12 = float(properties['G12'])
+        v12 = float(properties['v12'])
 
         Q11 = E1 / (1 - v12 ** 2)
         Q12 = v12 * E1 / (1 - v12 ** 2)
