@@ -3,15 +3,16 @@ from layer import Layer
 
 
 class Stack:
-    def __init__(self, layers_data, forces_data):
-
-        self.force = forces_data
+    def __init__(self, stack_data):
+        forces_data = stack_data['forces']
+        layers_data = stack_data['layers']
+        self.force = np.array([forces_data['Fx'],forces_data['Fy'],forces_data['Fz'],forces_data['Mx'],forces_data['My'], forces_data['Mxy']])
         self.layers = []
 
         total_height = 0
         for layer in layers_data:
-            self.layers.append(Layer(*layer, total_height))
-            total_height = total_height + float(layer[1])
+            self.layers.append(Layer(float(layer['angle'])*np.pi, float(layer['thickness']), layer['material'], total_height))
+            total_height = total_height + float(layer['thickness'])
         self.midplane = total_height / 2
 
         self.ABD = self.get_ABD()

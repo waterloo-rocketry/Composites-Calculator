@@ -5,21 +5,17 @@ import numpy as np
 class Material:
     def __init__(self, material_data):
 
-        self.F1t = float(material_data[0])
-        self.F1c = float(material_data[1])
-        self.F2t = float(material_data[2])
-        self.F2c = float(material_data[3])
-        self.F12 = float(material_data[4])
-        mode, self.file = material_data[5:]
+        self.F1t = float(material_data['F1t'])
+        self.F1c = float(material_data['F1c'])
+        self.F2t = float(material_data['F2t'])
+        self.F2c = float(material_data['F2c'])
+        self.F12 = float(material_data['F12'])
 
-        if(mode=='load'):
-            self.Q_0 = self.load_Q_0()
-        elif(mode=='calc'):
-            self.Q_0 = self.calculate_Q_0()
+        if(material_data['Q']):
+            self.Q_0 = np.array(material_data['Q'])
+        elif(material_data['properties']):
+            self.Q_0 = self.calculate_Q_0(material_data['properties'])
 
-    def load_Q_0(self):
-        Q = np.genfromtxt(self.file, delimiter=',')
-        return Q
 
     def calculate_Q_0(self):
         with open(self.file) as csvfile:

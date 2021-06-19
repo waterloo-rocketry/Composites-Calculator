@@ -1,8 +1,7 @@
 import unittest
-
+import json
 import numpy as np
 from stack import Stack
-from data_loading import DataHelper
 
 
 class TestCompositesCalculator(unittest.TestCase):
@@ -11,9 +10,9 @@ class TestCompositesCalculator(unittest.TestCase):
     strain_tolerance = 10**-5
 
     def test_example_1(self):
-        layer_data = DataHelper.get_layers("../data/fixtures/example_1_layers.csv")
-        forces_data = DataHelper.load_forces("../data/fixtures/example_1_forces.csv")
-        stack = Stack(layer_data, forces_data)
+        with open('data/stacks/example1.json') as f:
+            stack_data = json.load(f)
+        stack = Stack(stack_data)
         Q_0 = np.array([[155.7, 3.02, 0], [3.02, 12.16, 0], [0, 0, 4.40]]) * 10 ** 9
 
         # assert that the mid-plane is 4 x thickness / 2, or 2 x thickness

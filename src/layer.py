@@ -1,6 +1,5 @@
 import numpy as np
-
-from data_loading import DataHelper
+import json
 from material import Material
 
 
@@ -8,7 +7,8 @@ class Layer:
     def __init__(self, angle, thickness, file, height):
         self.angle = float(angle)
         self.thickness = float(thickness)
-        material_data = DataHelper.get_material(file)
+        with open(file) as f:
+            material_data = json.load(f)
         self.material = Material(material_data)
 
         m = np.cos(self.angle)
@@ -34,7 +34,7 @@ class Layer:
         self.local_ply_stress = np.dot(self.T2, self.global_ply_stress)
 
     def tsai_wu(self):
-        
+
         f1 = 1 / self.material.F1t - 1 / self.material.F1c
         f11 = 1 / (self.material.F1t * self.material.F1c)
         f2 = 1 / self.material.F2t - 1 / self.material.F2c

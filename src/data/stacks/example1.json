@@ -1,0 +1,32 @@
+{
+      "forces": {
+        "Fx":50400,
+        "Fy":1809,
+        "Fz":0,
+        "Mx":0,
+        "My":0,
+        "Mxy":0
+        },
+      "layers": [
+        {
+          "thickness": 0.00015,
+          "angle": 0,
+          "material": "data/materials/carbon_epoxy.json"
+        },
+        {
+          "thickness": 0.00015,
+          "angle": 0.5,
+          "material": "data/materials/carbon_epoxy.json"
+        },
+        {
+          "thickness": 0.00015,
+          "angle": 0.5,
+          "material": "data/materials/carbon_epoxy.json"
+        },
+        {
+          "thickness": 0.00015,
+          "angle": 0,
+          "material": "data/materials/carbon_epoxy.json"
+        }
+      ]
+    }

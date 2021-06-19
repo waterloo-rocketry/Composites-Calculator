@@ -1,8 +1,8 @@
-from data_loading import DataHelper
+from material import Material
 from stack import Stack
+import json
 
 if __name__ == "__main__":
-
-    layer_data = DataHelper.get_layers("../data/layers.csv")
-    forces_data = DataHelper.load_forces("../data/forces.csv")
-    stack = Stack(layer_data, forces_data)
+    with open('data/stacks/example1.json') as f:
+        stack_data = json.load(f)
+    stack = Stack(stack_data)
