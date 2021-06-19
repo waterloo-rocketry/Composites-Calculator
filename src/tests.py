@@ -60,17 +60,6 @@ class TestCompositesCalculator(unittest.TestCase):
         np.testing.assert_allclose(stack.layers[1].local_ply_stress, np.array([3.023 * 10 ** 6, 1.217216 * 10 ** 7, 0]),
                                    atol=self.stress_tolerance)
 
-    def test_example_2(self):
-        with open('data/stacks/example2.json') as f:
-            stack_data = json.load(f)
-        stack = Stack(stack_data)
-        Q_0 = np.array([[155.7, 3.02, 0], [3.02, 12.16, 0], [0, 0, 4.40]]) * 10 ** 9
-
-        ABD = stack.get_ABD()
-        A = ABD[0:3, 0:3]
-        B = ABD[3:6, 0:3]
-        D = ABD[3:6, 3:6]
-        print(B)
 
 
 if __name__ == '__main__':
