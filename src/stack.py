@@ -33,9 +33,9 @@ class Stack:
         for layer in self.layers:
             h_0 = layer.height - self.midplane
             h_1 = layer.height + layer.thickness - self.midplane
-            A = A + layer.Q_bar * (h_1 - h_0)
-            B = B + layer.Q_bar * (h_1 ** 2 - h_0 ** 2) / 2
-            D = D + layer.Q_bar * (h_1 ** 3 - h_0 ** 3) / 3
+            A += layer.Q_bar * (h_1 - h_0)
+            B += layer.Q_bar * (h_1 ** 2 - h_0 ** 2) / 2
+            D += layer.Q_bar * (h_1 ** 3 - h_0 ** 3) / 3
 
         ABD = np.concatenate(
             (
