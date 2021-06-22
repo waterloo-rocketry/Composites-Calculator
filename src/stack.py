@@ -1,8 +1,19 @@
 import numpy as np
 from layer import Layer
 
-
+"""Represents a stack consisting of any number of layers, and the forces applied to it"""
 class Stack:
+    """
+    format of stack_data
+
+    a dictionary with the following keys:
+    name - the name of the stack
+    forces - a dict with Fx,Fy,Fz,Mx,My,Mxy
+    layers - an array of dicts with the keys thickness,angle,material_path
+
+    material path is a relative path to the material file to be used for the layer
+    example can be found at src/data/stacks/example1.json
+    """
     def __init__(self, stack_data):
         self.name = stack_data['name']
         forces_data = stack_data['forces']
@@ -24,7 +35,7 @@ class Stack:
         self.kstrain_glob = midstrain[3:]
         self.failed, self.failed_layers_indices = self.failure_criterion()
 
-
+    """Evaluates the stiffness matrix (ABD matrix) for the laminate"""
     def get_ABD(self):
         A = np.zeros(shape=(3, 3))
         B = np.zeros(shape=(3, 3))
@@ -45,6 +56,12 @@ class Stack:
             axis=1)
         return ABD
 
+    """
+    evaluates the e and k strains based on the forces applied and the ABD matrix
+    
+    also iterates over the layers, having them calculate the per-ply strain and stresses,
+    and converts them to local orientations
+    """
     def get_strains_and_stresses(self):
         midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), self.force.astype(float)), decimals=6)
 
@@ -53,6 +70,9 @@ class Stack:
 
         return midstrain
 
+    """
+    iterates over the layers and evaluates each of their tsai wu failure criterion
+    """
     def failure_criterion(self):
         failed = False
         ply_failure_indices = []
@@ -69,6 +89,7 @@ class Stack:
             ply_failure_indices,
         )
 
+    """"prints output to the console, should probably produce more output as new requirements are identified"""
     def produce_text_output(self):
         print(f"Displaying analysis for: {self.name}")
 
