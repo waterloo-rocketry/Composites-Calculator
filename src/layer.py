@@ -1,13 +1,18 @@
-import numpy as np
 import json
+
+import numpy as np
+
 from material import Material
 
 """represents a layer of laminate material in a stack"""
+
+
 class Layer:
     """
     the layer takes an angle, a thickness, a path to the materials file, and the heigt in the stack,
     with the height measured from the bottom of the stack to the bottom of the layer
     """
+
     def __init__(self, angle, thickness, file, height):
         self.angle = float(angle)
         self.thickness = float(thickness)
@@ -21,7 +26,8 @@ class Layer:
             [[m ** 2, n ** 2, 2 * m * n], [n ** 2, m ** 2, -2 * m * n], [-m * n, m * n, m ** 2 - n ** 2]])
         self.T2 = np.array(
             [[m ** 2, n ** 2, m * n], [n ** 2, m ** 2, -m * n], [-2 * m * n, 2 * m * n, m ** 2 - n ** 2]])
-        Q_bar = np.matmul(np.matmul(np.linalg.inv(self.T1), self.material.Q_0), self.T2)
+        Q_bar = np.matmul(np.matmul(np.linalg.inv(
+            self.T1), self.material.Q_0), self.T2)
         self.Q_bar = Q_bar
 
         self.height = height
@@ -32,15 +38,16 @@ class Layer:
         self.local_ply_stress = []
 
     """evaluates the strains and stresses in a global and a local coordinate frame"""
+
     def get_ply_stress_strain(self, estrain, kstrain, midplane):
         self.global_ply_strain = estrain + (self.height - midplane) * kstrain
         self.global_ply_stress = np.dot(self.Q_bar, self.global_ply_strain)
         self.local_ply_strain = np.dot(self.T1, self.global_ply_strain)
         self.local_ply_stress = np.dot(self.T2, self.global_ply_stress)
 
-
     """applies the tsai wu failure criterion to the layer
     must be done after the stresses and strains have been evaluated"""
+
     def tsai_wu(self):
 
         f1 = 1 / self.material.F1t - 1 / self.material.F1c

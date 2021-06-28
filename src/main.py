@@ -1,10 +1,10 @@
-from sys import argv
-from os import path
-from stack import Stack
 import json
+from sys import argv
+
+from stack import Stack
 
 if __name__ == "__main__":
-    if(len(argv)==1):
+    if(len(argv) == 1):
         print('Please specify the file path for the stack')
 
     stack_path = argv[1]

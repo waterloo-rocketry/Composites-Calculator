@@ -1,7 +1,10 @@
 import numpy as np
+
 from layer import Layer
 
 """Represents a stack consisting of any number of layers, and the forces applied to it"""
+
+
 class Stack:
     """
     format of stack_data
@@ -14,16 +17,19 @@ class Stack:
     material path is a relative path to the material file to be used for the layer
     example can be found at src/data/stacks/example1.json
     """
+
     def __init__(self, stack_data):
         self.name = stack_data['name']
         forces_data = stack_data['forces']
         layers_data = stack_data['layers']
-        self.force = np.array([forces_data['Fx'],forces_data['Fy'],forces_data['Fz'],forces_data['Mx'],forces_data['My'], forces_data['Mxy']])
+        self.force = np.array([forces_data['Fx'], forces_data['Fy'], forces_data['Fz'],
+                              forces_data['Mx'], forces_data['My'], forces_data['Mxy']])
 
         self.layers = []
         total_height = 0
         for layer in layers_data:
-            self.layers.append(Layer(float(layer['angle'])*np.pi, float(layer['thickness']), layer['material'], total_height))
+            self.layers.append(Layer(float(
+                layer['angle'])*np.pi, float(layer['thickness']), layer['material'], total_height))
             total_height = total_height + float(layer['thickness'])
         self.midplane = total_height / 2
 
@@ -36,6 +42,7 @@ class Stack:
         self.failed, self.failed_layers_indices = self.failure_criterion()
 
     """Evaluates the stiffness matrix (ABD matrix) for the laminate"""
+
     def get_ABD(self):
         A = np.zeros(shape=(3, 3))
         B = np.zeros(shape=(3, 3))
@@ -62,17 +69,21 @@ class Stack:
     also iterates over the layers, having them calculate the per-ply strain and stresses,
     and converts them to local orientations
     """
+
     def get_strains_and_stresses(self):
-        midstrain = np.round(np.matmul(np.linalg.inv(self.ABD), self.force.astype(float)), decimals=6)
+        midstrain = np.round(np.matmul(np.linalg.inv(
+            self.ABD), self.force.astype(float)), decimals=6)
 
         for layer in self.layers:
-            layer.get_ply_stress_strain(midstrain[:3], midstrain[3:], self.midplane)
+            layer.get_ply_stress_strain(
+                midstrain[:3], midstrain[3:], self.midplane)
 
         return midstrain
 
     """
     iterates over the layers and evaluates each of their tsai wu failure criterion
     """
+
     def failure_criterion(self):
         failed = False
         ply_failure_indices = []
@@ -90,6 +101,7 @@ class Stack:
         )
 
     """"prints output to the console, should probably produce more output as new requirements are identified"""
+
     def produce_text_output(self):
         print(f"Displaying analysis for: {self.name}")
 
@@ -104,5 +116,5 @@ class Stack:
             print('Laminate failed\n')
             print('The failed laminates were: ')
             for i in range(len(self.failed_layers_indices)):
-                print(f'\t Layer {i} - Thickness: {self.layers[i].thickness} meters, Angle: {self.layers[i].angle} pi radians ')
-
+                print(
+                    f'\t Layer {i} - Thickness: {self.layers[i].thickness} meters, Angle: {self.layers[i].angle} pi radians ')
