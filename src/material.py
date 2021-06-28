@@ -1,19 +1,20 @@
 import numpy as np
 
-"""represents a material that the layers can be made of"""
-
 
 class Material:
-    """
-    material data is a dict with the following keys for maximum forces:
-    F1t,F1c,F2t,F2c,F12
-
-    It also must have one of two other keys:
-    Q - a 2D array of the values for the Q matrix
-    material_properties - a dict with the keys E1,E2,G12,v12
-    """
+    """Represents a material that the layers can be made of"""
 
     def __init__(self, material_data):
+        """
+        material data is a dict with the following keys for maximum forces:
+        F1t,F1c,F2t,F2c,F12 (all Newtons)
+
+        It also must have one of two other keys:
+        Q - a 2D array of the values for the Q matrix (Pa)
+        material_properties, a dict with the keys:
+         E1,E2,G12, (all Pascals)
+         v12 (poissons ratio, dimensionless)
+        """
 
         self.F1t = float(material_data['F1t'])
         self.F1c = float(material_data['F1c'])
@@ -21,14 +22,14 @@ class Material:
         self.F2c = float(material_data['F2c'])
         self.F12 = float(material_data['F12'])
 
-        if(material_data['Q']):
+        if 'Q' in material_data:
             self.Q_0 = np.array(material_data['Q'])
-        elif(material_data['properties']):
+        elif 'properties' in material_data:
             self.Q_0 = self.calculate_Q_0(material_data['properties'])
 
-    """evaluates the Q_0 matrix from the material properties in the case that the material properties were specified"""
-
     def calculate_Q_0(self, properties):
+        """Evaluates the Q_0 matrix from the material properties in the case that the material properties were
+        specified """
 
         E1 = float(properties['E1'])
         E2 = float(properties['E2'])

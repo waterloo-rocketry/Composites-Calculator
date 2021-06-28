@@ -3,7 +3,7 @@ import json
 
 import numpy as np
 
-from stack import Stack
+from src.stack import Stack
 
 
 class TestCompositesCalculator(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestCompositesCalculator(unittest.TestCase):
     strain_tolerance = 10**-5
 
     def test_example_1(self):
-        with open('data/stacks/example1.json') as f:
+        with open('tests/data/stacks/example1.json') as f:
             stack_data = json.load(f)
         stack = Stack(stack_data)
         Q_0 = np.array(

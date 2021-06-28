@@ -4,18 +4,20 @@ import numpy as np
 
 from material import Material
 
-"""represents a layer of laminate material in a stack"""
-
 
 class Layer:
-    """
-    the layer takes an angle, a thickness, a path to the materials file, and the heigt in the stack,
-    with the height measured from the bottom of the stack to the bottom of the layer
-    """
+    """Represents a layer of laminate material in a stack"""
 
     def __init__(self, angle, thickness, file, height):
-        self.angle = float(angle)
-        self.thickness = float(thickness)
+        """
+        The layer takes:
+        an angle (pi radians,
+        a thickness (meters),
+        a path to the materials file,
+        height in the stack (meters), with the height measured from the bottom of the stack to the bottom of the layer
+        """
+        self.angle = angle
+        self.thickness = thickness
         with open(file) as f:
             material_data = json.load(f)
         self.material = Material(material_data)
@@ -37,18 +39,16 @@ class Layer:
         self.local_ply_strain = []
         self.local_ply_stress = []
 
-    """evaluates the strains and stresses in a global and a local coordinate frame"""
-
     def get_ply_stress_strain(self, estrain, kstrain, midplane):
+        """Evaluates the strains and stresses in a global and a local coordinate frame"""
         self.global_ply_strain = estrain + (self.height - midplane) * kstrain
         self.global_ply_stress = np.dot(self.Q_bar, self.global_ply_strain)
         self.local_ply_strain = np.dot(self.T1, self.global_ply_strain)
         self.local_ply_stress = np.dot(self.T2, self.global_ply_stress)
 
-    """applies the tsai wu failure criterion to the layer
-    must be done after the stresses and strains have been evaluated"""
-
     def tsai_wu(self):
+        """Applies the tsai wu failure criterion to the layer
+          must be done after the stresses and strains have been evaluated"""
 
         f1 = 1 / self.material.F1t - 1 / self.material.F1c
         f11 = 1 / (self.material.F1t * self.material.F1c)
